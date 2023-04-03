@@ -19,6 +19,7 @@ def perform_integration_by_parts(integral: sympy.Integral, test_function_v: symp
     laplacian_args = laplacian_function.args
     trial_function_u = laplacian_args[0]
     print("First argument of Laplace Operator: ")
+    #TODO argument of laplace operator can be a complex expression
     print(trial_function_u)
 
     # Define the gradient of the trial function (argument of the laplace function)
@@ -34,12 +35,23 @@ def perform_integration_by_parts(integral: sympy.Integral, test_function_v: symp
     inner_func = sympy.Function("inner")(nabla_trial_function_u, nabla_test_function_v)
     
     res_of_integration_by_parts = integral_args.subs(trial_test_mult, inner_func)
-    integrated_parts = sympy.Integral(res_of_integration_by_parts, omega)
+    integrated_parts = sympy.Integral(-res_of_integration_by_parts, omega)
     print("")
     print("Transformed Integral: ")
     sympy.pprint(integrated_parts)
     return integrated_parts
 
+
+def check_linearity(term):
+    utils.print_space("Checking Linearity")
+    print(type(term))
+    exponential = term.atoms(sympy.Pow)
+    if len(exponential) > 0:    
+        for exponential_arg in exponential:
+            laplace_in_exponential = exponential_arg.atoms(Laplacian)
+            if len(laplace_in_exponential) > 0:
+                print("Nonlinear PDE - path not programmed yet")
+                raise Exception("Nonlinear PDE")
 
 def integrate_by_parts(sympy_equation: sympy.Eq, test_function_v: sympy.Function, omega: sympy.Symbol):
     all_integrals = sympy_equation.atoms(sympy.Integral)
@@ -53,11 +65,13 @@ def integrate_by_parts(sympy_equation: sympy.Eq, test_function_v: sympy.Function
     utils.print_space("All Integrals of Equation: ")
     sympy.pprint(all_integrals)
 
+    #TODO Sort equation by trial function u to lhs (a), other functions to rhs (L)
     lhs = 0
     for i in lhs_integrals:
         if i.has(Laplacian):
             print("Laplacian found in current integral:")
             sympy.pprint(i)
+            check_linearity(i)
             new_integral = perform_integration_by_parts(i, test_function_v, omega)
             lhs = lhs + new_integral
         else:
@@ -69,6 +83,7 @@ def integrate_by_parts(sympy_equation: sympy.Eq, test_function_v: sympy.Function
         if i.has(Laplacian):
             print("Laplacian found in current integral: ")
             sympy.pprint(i)
+            check_linearity(i)
             new_integral = perform_integration_by_parts(i, test_function_v, omega)
             rhs = rhs + new_integral
         else:

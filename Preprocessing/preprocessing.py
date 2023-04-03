@@ -36,7 +36,6 @@ def get_test_function_v(sympy_equation: sympy.Eq):
 
 def multiply_with_test_function(sympy_equation: sympy.Eq, test_function: sympy.Function):
     utils.print_space("Multiply with Test Function")
-    #Test Funktion muss nach der Variablen differenzierbar sein
     m = sympy.Eq(sympy_equation.lhs * test_function, sympy_equation.rhs * test_function)
     print("Multiplied with test function - result:")
     sympy.pprint(m)
@@ -44,12 +43,11 @@ def multiply_with_test_function(sympy_equation: sympy.Eq, test_function: sympy.F
 
 
 def integrate_summands(functions, omega: sympy.Symbol):
-    ###### Linke Seite
     # Distributivgesetz - ausmultiplizieren
     splitted = sympy.expand(functions)
     splitted_args = sympy.Add.make_args(splitted)
 
-    # Integral über jeden Summand bilden und als Linke Seite der Gleichung festlegen
+    # Integral über jeden Summand bilden und Integrale addieren
     expr = 0
     for term in splitted_args:
         expr = expr + sympy.Integral(term, omega)

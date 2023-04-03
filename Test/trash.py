@@ -17,6 +17,7 @@ print(ufl_output)
 
 '''
 import sympy
+from sympy.vector import Laplacian
 from fenics import *
 
 mesh = UnitSquareMesh(8, 8)
@@ -25,8 +26,8 @@ u = TrialFunction(V)
 v = TestFunction(V)
 
 
-u = SpatialCoordinate(mesh)
-v = SpatialCoordinate(mesh)
+#u = SpatialCoordinate(mesh)
+#v = SpatialCoordinate(mesh)
 
 st = "inner(grad(u), grad(v))"
 
