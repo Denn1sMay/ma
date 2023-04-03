@@ -22,7 +22,7 @@ def perform_integration_by_parts(integral: sympy.Integral, test_function_v: symp
     print(trial_function_u)
 
     # Define the gradient of the trial function (argument of the laplace function)
-    nabla_grad = sympy.Function("nabla_grad")
+    nabla_grad = sympy.Function("grad")
 
     nabla_trial_function_u = nabla_grad(trial_function_u)
     # Define the nabla operator on the test function
@@ -31,7 +31,7 @@ def perform_integration_by_parts(integral: sympy.Integral, test_function_v: symp
     # Perform the integration by parts 
     #  -> replace the multiplication of laplace(u) * v
     trial_test_mult = laplacian_function * test_function_v
-    inner_func = sympy.Function("inner_func")(nabla_trial_function_u, nabla_test_function_v)
+    inner_func = sympy.Function("inner")(nabla_trial_function_u, nabla_test_function_v)
     
     res_of_integration_by_parts = integral_args.subs(trial_test_mult, inner_func)
     integrated_parts = sympy.Integral(res_of_integration_by_parts, omega)
@@ -50,13 +50,14 @@ def integrate_by_parts(sympy_equation: sympy.Eq, test_function_v: sympy.Function
     
     rhs_complete = sympy_equation.rhs
     rhs_integrals = rhs_complete.atoms(sympy.Integral)
-    
+    utils.print_space("All Integrals of Equation: ")
     sympy.pprint(all_integrals)
 
     lhs = 0
     for i in lhs_integrals:
         if i.has(Laplacian):
-            print("Laplacian found in current i")
+            print("Laplacian found in current integral:")
+            sympy.pprint(i)
             new_integral = perform_integration_by_parts(i, test_function_v, omega)
             lhs = lhs + new_integral
         else:
@@ -66,7 +67,8 @@ def integrate_by_parts(sympy_equation: sympy.Eq, test_function_v: sympy.Function
     rhs = 0
     for i in rhs_integrals:
         if i.has(Laplacian):
-            print("Laplacian found in current i")
+            print("Laplacian found in current integral: ")
+            sympy.pprint(i)
             new_integral = perform_integration_by_parts(i, test_function_v, omega)
             rhs = rhs + new_integral
         else:

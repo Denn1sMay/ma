@@ -16,22 +16,18 @@ V = sympy.Symbol("V")
 
 # Erstellen von Symbolen und Funktionen
 u = sympy.Function('u')(V)  # Trial
-f = sympy.Function('f')(N.x, N.y, N.z)  # input
 test_function = sympy.Function("test_function")(V)
+f = sympy.Function('f')(N.x, N.y, N.z)  # input
 # Berechnung der Poisson-Gleichung
 lap_u = Laplacian(u)  # Laplace-Operator auf u
 
 lap_f = Laplacian(f)
 
-poisson_equation = sympy.Eq((lap_u*2)/3 + 3, f)
+poisson_equation = sympy.Eq((lap_u*2)/3 + 3, lap_f)
 
 
 result = main.solve(poisson_equation, test_function)
 
 string_res = str(result.lhs)
-st = "2*inner_func(nabla_grad(u(V)), nabla_grad(test_function(V)))/3 + Integral(3*test_function(V))"
-print(st)
-
-fe = eval(st)
-print(fe)
+print(string_res)
 

@@ -2,7 +2,6 @@ import Preprocessing.preprocessing as pre
 import Main.transformations as tr
 import sympy
 from sympy.vector import CoordSys3D, Laplacian
-from IPython.display import display
 import Util.utils as utils
 
 
