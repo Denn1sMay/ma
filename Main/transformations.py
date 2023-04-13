@@ -3,7 +3,7 @@ from sympy.vector import CoordSys3D, Laplacian, Del
 import Util.utils as utils
 
 
-def perform_integration_by_parts_on_integral(integral: sympy.Integral, test_function_v: sympy.Function, omega: sympy.Symbol):
+def perform_integration_by_parts_on_integral(integral: sympy.Integral, test_function_v: sympy.Symbol, omega: sympy.Symbol):
     utils.print_space("Performing integration by parts on current integral")
     sympy.pprint(integral)
     # Get the integrated function
@@ -53,7 +53,7 @@ def check_linearity(term):
                 print("Nonlinear PDE - path not programmed yet")
                 raise Exception("Nonlinear PDE")
 
-def integrate_by_parts(sympy_equation: sympy.Eq, test_function_v: sympy.Function, omega: sympy.Symbol):
+def integrate_by_parts(sympy_equation: sympy.Eq, test_function_v: sympy.Symbol, omega: sympy.Symbol):
     all_integrals = sympy_equation.atoms(sympy.Integral)
 
 
@@ -88,7 +88,7 @@ def integrate_by_parts(sympy_equation: sympy.Eq, test_function_v: sympy.Function
             rhs = rhs + new_integral
         else:
             rhs = rhs + i
-
+            
     new_eq = sympy.Eq(lhs, rhs)
 
     return new_eq

@@ -3,7 +3,7 @@ from sympy.vector import CoordSys3D, Laplacian
 import Preprocessing.preprocessing as pre
 
 
-equation_string = "Laplacian(u+2) + 3 = f"
+equation_string = "Laplacian(u) + 3 = f"
 
 
 sympy_equation = pre.parse_string_equation(equation_string)

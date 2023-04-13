@@ -9,6 +9,7 @@ def useSympyLaplaceOperator(sympy_term):
     new_term = sympy_term
     for lap_atom in lap_atoms:
         laplacian_args = lap_atom.args
+        print(type(laplacian_args[0]))
         lap_operator = Laplacian(laplacian_args[0])
         new_term = new_term.subs(lap_atom, lap_operator)
     return new_term
@@ -75,7 +76,7 @@ def get_test_function_v(sympy_equation: sympy.Eq):
 
     return test_function_v, u_args
 
-def multiply_with_test_function(sympy_equation: sympy.Eq, test_function: sympy.Function):
+def multiply_with_test_function(sympy_equation: sympy.Eq, test_function: sympy.Symbol):
     utils.print_space("Multiply with Test Function")
     m = sympy.Eq(sympy_equation.lhs * test_function, sympy_equation.rhs * test_function)
     print("Multiplied with test function - result:")
@@ -96,14 +97,40 @@ def integrate_summands(functions, omega: sympy.Symbol):
     return expr
 
 
-def integrate_over_domain(sympy_equation: sympy.Eq):
-    utils.print_space("Integrate over Domain")
+def sort_equation(lhs, rhs, trial_function_u: sympy.Symbol):
+    lhs_atoms = lhs.atoms(sympy.Integral)
+    rhs_atoms = rhs.atoms(sympy.Integral)
+
+    lhs_sorted = 0
+    rhs_sorted = 0
+
+    for lhs_atom in lhs_atoms:
+        sympy.pprint(lhs_atom)
+        if lhs_atom.has(trial_function_u):
+            lhs_sorted = lhs_sorted + lhs_atom
+        else:
+            rhs_sorted = rhs_sorted + lhs_atom
+
+    for rhs_atom in rhs_atoms:
+        if rhs_atom.has(trial_function_u):
+            lhs_sorted = lhs_sorted + rhs_atom
+        else:
+            rhs_sorted = rhs_sorted + rhs_atom
+
+    utils.print_space("Sorted Equation:")
+    sympy.pprint(sympy.Eq(lhs_sorted, rhs_sorted))
+    return sympy.Eq(lhs_sorted, rhs_sorted)
+
+
+
+def integrate_over_domain_and_sort(sympy_equation: sympy.Eq, trial_function_u: sympy.Symbol):
+    utils.print_space("Integrate over Domain and Sort")
     omega = sympy.Symbol('omega')
 
     lhs = integrate_summands(sympy_equation.lhs, omega)
     rhs = integrate_summands(sympy_equation.rhs, omega)
-    integrals = sympy.Eq(lhs, rhs)
 
+    sorted_equation = sort_equation(lhs, rhs, trial_function_u)
     print("Integrated over domain:")
-    sympy.pprint(integrals)
-    return integrals, omega
+    sympy.pprint(sorted_equation)
+    return sorted_equation, omega

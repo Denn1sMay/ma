@@ -44,7 +44,7 @@ a = (inner(grad(u), grad(v))) * dx
 L = f * v * dx
 
 # ----------------------------
-a_gen, L_gen, s = main.get_weak_form(None, "u", "v", "-Laplacian(u)*2 = f")
+a_gen, L_gen, s = main.get_weak_form(None, "u", "v", "-Laplacian(u) = f")
 
 utils.print_space("Original Form:")
 print("lhs")
