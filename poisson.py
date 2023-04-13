@@ -1,23 +1,30 @@
 import sympy
 from sympy.vector import CoordSys3D, Laplacian
 import main
-from fenics import *
+from dolfinx import *
+from mpi4py import MPI
+from ufl import *
+
 
 N = CoordSys3D('N')  # Erstellen eines Koordinatensystems
 
-V = sympy.Symbol("V")
+func_space = sympy.Symbol("V")
 
 # Erstellen von Symbolen und Funktionen
-u = sympy.Function('u')(V)  # Trial
-test_function = sympy.Function("test_function")(V)
-f = sympy.Function('f')(N.x, N.y, N.z)  # input
+u = sympy.Function('u')(func_space)  # Trial
+v = sympy.Function('v')(func_space)
+x = sympy.Symbol("x") #sympy.Function('x')(N.x, N.y, N.z)  # input
 # Berechnung der Poisson-Gleichung
 lap_u = Laplacian(u)  # Laplace-Operator auf u
 
-lap_f = Laplacian(f)
+poisson_equation = sympy.Eq(-lap_u, x)
 
-poisson_equation = sympy.Eq(-lap_u, f)
+# ------------------------
+domain = mesh.create_unit_square(MPI.COMM_WORLD, 8, 8, mesh.CellType.quadrilateral)
+#mesh = UnitSquareMesh(8, 8)
+V = fem.FunctionSpace(domain, ("CG", 1))
+trial = TrialFunction(V)
+test = TestFunction(V)
 
 
-result = main.solve(poisson_equation, test_function)
-
+result = main.get_weak_form(poisson_equation, u, v, trial, test)

@@ -18,10 +18,15 @@ print(ufl_output)
 '''
 import sympy
 from sympy.vector import Laplacian
-from fenics import *
+#from fenics import *
+from dolfinx import *
+from ufl import *
+from mpi4py import MPI
 
-mesh = UnitSquareMesh(8, 8)
-V = FunctionSpace(mesh, 'P', 1)
+
+domain = mesh.create_unit_square(MPI.COMM_WORLD, 8, 8, mesh.CellType.quadrilateral)
+#mesh = UnitSquareMesh(8, 8)
+V = fem.FunctionSpace(domain, ("CG", 1))
 u = TrialFunction(V)
 v = TestFunction(V)
 
@@ -29,16 +34,19 @@ v = TestFunction(V)
 #u = SpatialCoordinate(mesh)
 #v = SpatialCoordinate(mesh)
 
-st = "inner(grad(u), grad(v))"
+st = "inner(grad(u), grad(v)) * dx"
 
 fe_ex = eval(st)
 
 print("")
 print(type(fe_ex))
+print("")
+
 print(fe_ex)
 
-
-inner_args = fe_ex.ufl_operands
-print(inner_args)
+pure_ufl = inner(grad(u), grad(v)) * dx
+print(pure_ufl)
+#inner_args = fe_ex.ufl_operands
+#print(inner_args)
 
 

@@ -1,0 +1,12 @@
+import sympy
+from sympy.vector import CoordSys3D, Laplacian
+import Preprocessing.preprocessing as pre
+
+
+equation_string = "Laplacian(u+2) + 3 = f"
+
+
+sympy_equation = pre.parse_string_equation(equation_string)
+
+
+#sympy.pprint(Laplacian(sympy.Symbol("u")) + 3)

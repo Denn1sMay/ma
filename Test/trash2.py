@@ -1,6 +1,6 @@
 import sympy
 from sympy.vector import Laplacian
-from fenics import *
+from dolfinx import *
 
 V = sympy.Symbol("V")
 

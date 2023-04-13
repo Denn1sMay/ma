@@ -3,7 +3,7 @@ from sympy.vector import CoordSys3D, Laplacian, Del
 import Util.utils as utils
 
 
-def perform_integration_by_parts(integral: sympy.Integral, test_function_v: sympy.Function, omega: sympy.Symbol):
+def perform_integration_by_parts_on_integral(integral: sympy.Integral, test_function_v: sympy.Function, omega: sympy.Symbol):
     utils.print_space("Performing integration by parts on current integral")
     sympy.pprint(integral)
     # Get the integrated function
@@ -18,7 +18,7 @@ def perform_integration_by_parts(integral: sympy.Integral, test_function_v: symp
     # Get the trial function (arguments/ parameters of the laplacian function)
     laplacian_args = laplacian_function.args
     trial_function_u = laplacian_args[0]
-    print("First argument of Laplace Operator: ")
+    print("Argument of Laplace Operator: ")
     #TODO argument of laplace operator can be a complex expression
     print(trial_function_u)
 
@@ -72,7 +72,7 @@ def integrate_by_parts(sympy_equation: sympy.Eq, test_function_v: sympy.Function
             print("Laplacian found in current integral:")
             sympy.pprint(i)
             check_linearity(i)
-            new_integral = perform_integration_by_parts(i, test_function_v, omega)
+            new_integral = perform_integration_by_parts_on_integral(i, test_function_v, omega)
             lhs = lhs + new_integral
         else:
             lhs = lhs + i
@@ -84,7 +84,7 @@ def integrate_by_parts(sympy_equation: sympy.Eq, test_function_v: sympy.Function
             print("Laplacian found in current integral: ")
             sympy.pprint(i)
             check_linearity(i)
-            new_integral = perform_integration_by_parts(i, test_function_v, omega)
+            new_integral = perform_integration_by_parts_on_integral(i, test_function_v, omega)
             rhs = rhs + new_integral
         else:
             rhs = rhs + i
