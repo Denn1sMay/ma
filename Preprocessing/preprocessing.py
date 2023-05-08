@@ -3,7 +3,7 @@ from sympy.vector import CoordSys3D, Laplacian, Del
 import Util.utils as utils
 
 
-def useSympyLaplaceOperator(sympy_term):
+def use_sympy_laplace_operator(sympy_term):
     undefined_laplacian_function = sympy.Function("Laplacian")
     lap_atoms = sympy_term.atoms(undefined_laplacian_function)
     new_term = sympy_term
@@ -29,14 +29,14 @@ def parse_string_equation(string_equation: str):
         sympy.pprint(lhs_parsed)
         print("rhs:")
         sympy.pprint(rhs_parsed)
-        lhs_with_operators = useSympyLaplaceOperator(lhs_parsed)
-        rhs_with_operators = useSympyLaplaceOperator(rhs_parsed)
+        lhs_with_operators = use_sympy_laplace_operator(lhs_parsed)
+        rhs_with_operators = use_sympy_laplace_operator(rhs_parsed)
     else:
         lhs_parsed = sympy.parse_expr(equation_sides[0], evaluate=False)
         print("lhs:")
         sympy.pprint(lhs_parsed)
         rhs_with_operators = sympy.parse_expr("0", evaluate=False)
-        lhs_with_operators = useSympyLaplaceOperator(lhs_parsed)
+        lhs_with_operators = use_sympy_laplace_operator(lhs_parsed)
 
     parsed_equation = sympy.Eq(lhs_with_operators, rhs_with_operators)
     print("Result with sympy operators:")
@@ -116,9 +116,7 @@ def sort_equation(lhs, rhs, trial_function_u: sympy.Symbol):
             lhs_sorted = lhs_sorted + rhs_atom
         else:
             rhs_sorted = rhs_sorted + rhs_atom
-
-    utils.print_space("Sorted Equation:")
-    sympy.pprint(sympy.Eq(lhs_sorted, rhs_sorted))
+            
     return sympy.Eq(lhs_sorted, rhs_sorted)
 
 
@@ -131,6 +129,6 @@ def integrate_over_domain_and_sort(sympy_equation: sympy.Eq, trial_function_u: s
     rhs = integrate_summands(sympy_equation.rhs, omega)
 
     sorted_equation = sort_equation(lhs, rhs, trial_function_u)
-    print("Integrated over domain:")
+    print("Sorted and Integrated over domain:")
     sympy.pprint(sorted_equation)
     return sorted_equation, omega

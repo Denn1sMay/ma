@@ -1,5 +1,5 @@
 from mpi4py import MPI
-from dolfinx import mesh
+from dolfinx import mesh, io, plot
 import numpy
 from dolfinx import fem
 from dolfinx.fem import FunctionSpace
@@ -9,17 +9,19 @@ from petsc4py.PETSc import ScalarType
 import main
 import sympy
 import Util.utils as utils
+from Util.Boundaries import Boundaries
 
+ # https://jsdokken.com/dolfinx-tutorial/chapter1/fundamentals_code.html
+
+element = VectorElement("Lagrange", triangle, 1)
+
+#domain = mesh.create_unit_cube(MPI.COMM_WORLD, 8, 8, 8)
 domain = mesh.create_unit_square(MPI.COMM_WORLD, 8, 8, mesh.CellType.quadrilateral)
+
 V = fem.FunctionSpace(domain, ("CG", 1))
-
-
-
 
 uD = fem.Function(V)
 uD.interpolate(lambda x: 1 + x[0]**2 + 2 * x[1]**2)
-
-
 
 # Create facet to cell connectivity required to determine boundary facets
 tdim = domain.topology.dim
@@ -27,23 +29,26 @@ fdim = tdim - 1
 domain.topology.create_connectivity(fdim, tdim)
 boundary_facets = mesh.exterior_facet_indices(domain.topology)
 
-
-
-
 boundary_dofs = fem.locate_dofs_topological(V, fdim, boundary_facets)
 bc = fem.dirichletbc(uD, boundary_dofs)
-
 
 u = TrialFunction(V)
 v = TestFunction(V)
 
-
 f = fem.Constant(domain, ScalarType(-6))
-
+#c = fem.Constant(domain, ScalarType((1, 1)))
 a = (inner(grad(u), grad(v))) * dx
+g = fem.Constant(domain, ScalarType(-4))
 L = f * v * dx
 
+#m = dot(c,c)
+na = div(u)
+nab = nabla_div(u)
+#print(m)
 # ----------------------------
+def some_func(u):
+    return u * 2
+
 a_gen, L_gen, s = main.get_weak_form(None, "u", "v", "-Laplacian(u) = f")
 
 utils.print_space("Original Form:")
@@ -57,9 +62,8 @@ print(eval(a_gen))
 print("rhs")
 print(eval(L_gen))
 
+print(nabla_div(u))
 problem = fem.petsc.LinearProblem(eval(a_gen), eval(L_gen), bcs=[bc], petsc_options={"ksp_type": "preonly", "pc_type": "lu"})
-
-
 
 uh = problem.solve()
 
@@ -83,3 +87,32 @@ error_max = numpy.max(numpy.abs(uD.x.array-uh.x.array))
 if domain.comm.rank == 0:
     print(f"Error_L2 : {error_L2:.2e}")
     print(f"Error_max : {error_max:.2e}")
+
+
+
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+with io.XDMFFile(domain.comm, "out/poisson.xdmf", "w") as file:
+    file.write_mesh(domain)
+    file.write_function(uh)
+
+try:
+    import pyvista
+    cells, types, x = plot.create_vtk_mesh(V)
+    grid = pyvista.UnstructuredGrid(cells, types, x)
+    grid.point_data["u"] = uh.x.array.real
+    grid.set_active_scalars("u")
+    plotter = pyvista.Plotter()
+    plotter.add_mesh(grid, show_edges=True)
+    warped = grid.warp_by_scalar()
+    plotter.add_mesh(warped)
+    if pyvista.OFF_SCREEN:
+        pyvista.start_xvfb(wait=0.1)
+        plotter.screenshot("uh_poisson.png")
+    else:
+        plotter.show()
+
+except ModuleNotFoundError:
+    print("'pyvista' is required to visualise the solution")
+    print("Install 'pyvista' with pip: 'python3 -m pip install pyvista'")
